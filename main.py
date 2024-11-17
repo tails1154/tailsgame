@@ -1,6 +1,10 @@
 import pygame
 import json
 import sys
+import os
+import subprocess
+import importlib
+
 
 # pygame setup
 pygame.init()
@@ -30,6 +34,7 @@ else:
     sys.exit(1)
 menu=True
 gameReading=False
+ready=False
 font = pygame.font.Font(None, 36)
 while running:
     # poll for events
@@ -42,6 +47,23 @@ while running:
                 if menu:
                     menu=False
                     gameReading=True
+                if ready:
+                    gameReading=False
+                    ready=False
+                    game.start()
+                    ready=False
+                    screen.fill("blue")
+                    text_surface = font.render("Unmounting...", True, (255, 255, 255))
+                    text_rect = text_surface.get_rect(center=(400, 300))
+                    screen.blit(text_surface, text_rect)
+                    pygame.display.flip()
+                    game = ""
+                    subprocess.call(['unmount', mount])
+                    text_surface = font.render("Ready for new game!", True, (255, 255, 255))
+                    text_rect = text_surface.get_rect(center=(400, 300))
+                    screen.blit(text_surface, text_rect)
+                    pygame.display.flip()
+
     # fill the screen with a color to wipe away anything from last frame
     screen.fill("blue")
 
@@ -55,6 +77,14 @@ while running:
         text_rect = text_surface.get_rect(center=(400, 300))
         screen.blit(text_surface, text_rect)
         pygame.display.flip()
+        subprocess.call(['mount', floppy, mount])
+        game = importlib.import_module(mount + "/game")
+        ready=True
+        gameReading=False
+        screen.fill("blue")
+    if ready:
+        text_surface = font.render("Press enter to start!", True, (255,255,255))
+        text_rect = text_surface.get_rect(center=(400, 300))
 
     # flip() the display to put your work on screen
     pygame.display.flip()
