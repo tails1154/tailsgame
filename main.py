@@ -47,10 +47,12 @@ while running:
                 if menu:
                     menu=False
                     gameReading=True
+            if event.key == pygame.K_SPACE:
                 if ready:
                     gameReading=False
                     ready=False
                     game.start()
+                    running = True
                     ready=False
                     screen.fill("blue")
                     text_surface = font.render("Unmounting...", True, (255, 255, 255))
@@ -58,11 +60,16 @@ while running:
                     screen.blit(text_surface, text_rect)
                     pygame.display.flip()
                     game = ""
-                    subprocess.call(['unmount', mount])
+                    subprocess.call(['umount', mount])
+                    subprocess.call(['umount', mount])
+                    subprocess.call(['umount', mount])
+                    subprocess.call(['umount', mount])
+                    subprocess.call(['umount', mount])
                     text_surface = font.render("Ready for new game!", True, (255, 255, 255))
                     text_rect = text_surface.get_rect(center=(400, 300))
                     screen.blit(text_surface, text_rect)
                     pygame.display.flip()
+                    menu=True
 
     # fill the screen with a color to wipe away anything from last frame
     screen.fill("blue")
@@ -78,13 +85,18 @@ while running:
         screen.blit(text_surface, text_rect)
         pygame.display.flip()
         subprocess.call(['mount', floppy, mount])
-        game = importlib.import_module(mount + "/game")
+        sys.path.insert(0, mount)
+        import game
         ready=True
         gameReading=False
+        menu=False
         screen.fill("blue")
     if ready:
-        text_surface = font.render("Press enter to start!", True, (255,255,255))
+        screen.fill("blue")
+        text_surface = font.render("Press space to start!", True, (255,255,255))
         text_rect = text_surface.get_rect(center=(400, 300))
+        screen.blit(text_surface, text_rect)
+        pygame.display.flip()
 
     # flip() the display to put your work on screen
     pygame.display.flip()
