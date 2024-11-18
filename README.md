@@ -1,5 +1,9 @@
 # TailsGame
 tailsgame is a stupid floppy disk console
+PLEASE EDIT CONFIG.JSON
 ## Requirements
 pygame
-### yay
+## How do I make a game???
+You need a floppy disk (or some storage media) and you need to make a python script on the root of the drive called game.py and a function called start() with the game stuff!
+## What systems does it work on?
+Linux. If you want to try to add support for windows, you can open a PR!
