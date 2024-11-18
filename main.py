@@ -55,17 +55,8 @@ while running:
                     running = True
                     ready=False
                     screen.fill("blue")
-                    text_surface = font.render("Unmounting...", True, (255, 255, 255))
-                    text_rect = text_surface.get_rect(center=(400, 300))
-                    screen.blit(text_surface, text_rect)
-                    pygame.display.flip()
-                    game = ""
-                    subprocess.call(['udisksctl', 'unmount', '-b', mount])
-                    text_surface = font.render("Ready for new game!", True, (255, 255, 255))
-                    text_rect = text_surface.get_rect(center=(400, 300))
-                    screen.blit(text_surface, text_rect)
-                    pygame.display.flip()
-                    menu=True
+                    pygame.quit()
+                    sys.exit(0)
 
     # fill the screen with a color to wipe away anything from last frame
     screen.fill("blue")
@@ -80,7 +71,16 @@ while running:
         text_rect = text_surface.get_rect(center=(400, 300))
         screen.blit(text_surface, text_rect)
         pygame.display.flip()
-        subprocess.call(['udisksctl', 'unmount', '-b', mount])
+        subprocess.call(['udisksctl', 'unmount', '-f', '-b', floppy])
+        subprocess.call(['udisksctl', 'unmount', '-f', '-b', floppy])
+        subprocess.call(['udisksctl', 'unmount', '-f', '-b', floppy])
+        subprocess.call(['udisksctl', 'unmount', '-f', '-b', floppy])
+        subprocess.call(['udisksctl', 'unmount', '-f', '-b', floppy])
+        subprocess.call(['udisksctl', 'unmount', '-f', '-b', floppy])
+        subprocess.call(['udisksctl', 'unmount', '-f', '-b', floppy])
+        subprocess.call(['udisksctl', 'unmount', '-f', '-b', floppy])
+        subprocess.call(['udisksctl', 'unmount', '-f', '-b', floppy])
+        subprocess.call(['udisksctl', 'unmount', '-f', '-b', floppy])
         result = subprocess.run(
             ['udisksctl', 'mount', '-b', floppy],
             stdout=subprocess.PIPE,
