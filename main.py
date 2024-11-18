@@ -1,13 +1,11 @@
+import os
 import pygame
 import json
 import sys
-import os
 import subprocess
-import importlib
-
-
 # pygame setup
 pygame.init()
+pygame.mixer.init()
 screen = pygame.display.set_mode((1280, 720))
 clock = pygame.time.Clock()
 running = True
@@ -51,7 +49,9 @@ while running:
                 if ready:
                     gameReading=False
                     ready=False
-                    game.start()
+                    print("Starting!")
+                    game.start(mount)
+                    print("Game Ended...")
                     running = True
                     ready=False
                     screen.fill("blue")
@@ -60,11 +60,7 @@ while running:
                     screen.blit(text_surface, text_rect)
                     pygame.display.flip()
                     game = ""
-                    subprocess.call(['umount', mount])
-                    subprocess.call(['umount', mount])
-                    subprocess.call(['umount', mount])
-                    subprocess.call(['umount', mount])
-                    subprocess.call(['umount', mount])
+                    subprocess.call(['udisksctl', 'unmount', '-b', mount])
                     text_surface = font.render("Ready for new game!", True, (255, 255, 255))
                     text_rect = text_surface.get_rect(center=(400, 300))
                     screen.blit(text_surface, text_rect)
@@ -84,8 +80,26 @@ while running:
         text_rect = text_surface.get_rect(center=(400, 300))
         screen.blit(text_surface, text_rect)
         pygame.display.flip()
-        subprocess.call(['mount', floppy, mount])
+        subprocess.call(['udisksctl', 'unmount', '-b', mount])
+        result = subprocess.run(
+            ['udisksctl', 'mount', '-b', floppy],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+        mount = result.stdout.split("Mounted " + floppy + " at ")[1]
+        print(mount)
+        #return mount
+        #print(mount)
+        #mount = mountiguess()
+        print(mount)
+        print("removing stupid new line")
+        mount = mount.replace("\n", "")
+        print(mount)
+        print("adding to path")
         sys.path.insert(0, mount)
+        print(sys.path)
+        print("Importing game")
         import game
         ready=True
         gameReading=False
@@ -104,3 +118,12 @@ while running:
     clock.tick(60)  # limits FPS to 60
 
 pygame.quit()
+def playsong(path):
+    pygame.mixer.music.load(path)
+    pygame.mixer.music.play()
+def pausesong():
+    pygame.mixer.music.pause()
+def unpausesong():
+    pygame.mixer.music.unpause()
+def rewindsong():
+    pygame.mixer.music.rewind()
