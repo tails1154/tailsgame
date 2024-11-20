@@ -15,7 +15,7 @@ config=f.read()
 print(config)
 config=json.loads(config)
 print(config)
-print("TailsGame Version v0.0.1")
+print("TailsGame Version v1.0.1")
 if config['floppy_location']:
     print("found config option floppy_location")
     floppy=config['floppy_location']
