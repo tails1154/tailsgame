@@ -33,6 +33,7 @@ else:
 menu=True
 gameReading=False
 ready=False
+rmplay=False
 font = pygame.font.Font(None, 36)
 while running:
     # poll for events
@@ -45,10 +46,23 @@ while running:
                 if menu:
                     menu=False
                     gameReading=True
+                    pygame.mixer.music.load("audio/wait.mp3", namehint="mp3")
+                    pygame.mixer.music.play(loops=-1)
             if event.key == pygame.K_SPACE:
                 if ready:
                     gameReading=False
                     ready=False
+                    screen.fill("blue")
+                    text_surface = font.render("Starting!", True, (255, 255, 255))
+                    text_rect = text_surface.get_rect(center=(400, 300))
+                    screen.blit(text_surface, text_rect)
+                    pygame.display.flip()
+                    pygame.mixer.music.load("audio/start.mp3", namehint="mp3")
+                    pygame.mixer.music.play()
+                    while pygame.mixer.music.get_busy():
+                        1+1
+                    pygame.mixer.music.stop()
+                    pygame.mixer.music.unload()
                     print("Starting!")
                     game.start(mount)
                     print("Game Ended...")
@@ -108,6 +122,10 @@ while running:
     if ready:
         screen.fill("blue")
         text_surface = font.render("Press space to start!", True, (255,255,255))
+        if not rmplay:
+            rmplay=True
+            pygame.mixer.music.load("audio/gameread.mp3", namehint="mp3")
+            pygame.mixer.music.play()
         text_rect = text_surface.get_rect(center=(400, 300))
         screen.blit(text_surface, text_rect)
         pygame.display.flip()
