@@ -1,3 +1,5 @@
+print("Starting TailsGame...")
+print("BGMusic in menu from msn tv 2")
 import os
 import pygame
 import json
@@ -6,9 +8,10 @@ import subprocess
 # pygame setup
 pygame.init()
 pygame.mixer.init()
-screen = pygame.display.set_mode((1280, 720))
+
 clock = pygame.time.Clock()
 running = True
+print("BGMusic in menu from msn tv 2")
 print("Loading config.json...")
 f = open("config.json", "rt")
 config=f.read()
@@ -30,6 +33,14 @@ else:
     print("Config Error!")
     print("mount_location not set!")
     sys.exit(1)
+if config['fullscreen']:
+    if config['fullscreen'] == "True":
+        flags=pygame.FULLSCREEN
+        screen = pygame.display.set_mode((1280, 720), flags)
+    else:
+        screen = pygame.display.set_mode((1280, 720))
+else:
+    screen = pygame.display.set_mode((1280, 720))
 menu=True
 gameReading=False
 ready=False

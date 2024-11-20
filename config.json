@@ -1,4 +1,5 @@
 {
     "floppy_location": "/dev/sda1",
-    "mount_location": "/mnt/floppy"
+    "mount_location": "/mnt/floppy",
+    "fullscreen": "True"
 }
