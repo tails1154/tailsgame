@@ -74,7 +74,12 @@ while running:
                         1+1
                     pygame.mixer.music.stop()
                     pygame.mixer.music.unload()
+                    pygame.mixer.music.load("audio/wait.mp3", namehint="mp3")
+                    pygame.mixer.music.play(loops=-1)
+                    print("Importing game")
+                    import game
                     print("Starting!")
+                    pygame.mixer.music.stop();pygame.mixer.music.unload()
                     game.start(mount)
                     print("Game Ended...")
                     running = True
@@ -124,8 +129,6 @@ while running:
         print("adding to path")
         sys.path.insert(0, mount)
         print(sys.path)
-        print("Importing game")
-        import game
         ready=True
         gameReading=False
         menu=False
