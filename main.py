@@ -6,11 +6,16 @@ import json
 import sys
 import subprocess
 # pygame setup
+
 pygame.init()
 pygame.mixer.init()
 
 clock = pygame.time.Clock()
-running = True
+running=False
+def start():
+    global running
+    running = True
+    pygame.init()
 print("BGMusic in menu from msn tv 2")
 print("Loading config.json...")
 f = open("config.json", "rt")
@@ -46,6 +51,10 @@ gameReading=False
 ready=False
 rmplay=False
 font = pygame.font.Font(None, 36)
+if __name__ == '__main__':
+    start()
+def restart():
+    start()
 while running:
     # poll for events
     # pygame.QUIT event means the user clicked X to close your window
@@ -150,12 +159,5 @@ while running:
     clock.tick(60)  # limits FPS to 60
 
 pygame.quit()
-def playsong(path):
-    pygame.mixer.music.load(path)
-    pygame.mixer.music.play()
-def pausesong():
-    pygame.mixer.music.pause()
-def unpausesong():
-    pygame.mixer.music.unpause()
-def rewindsong():
-    pygame.mixer.music.rewind()
+print("Exit")
+sys.exit()
