@@ -11,6 +11,46 @@ import time
 
 pygame.init()
 pygame.mixer.init()
+def gameInfo(gameId):
+    eshop = False
+    game = next(key for key, value in games.items() if value["id"] == gameId)  # Look for the correct gameId
+    screen.fill("orange")
+    eshop = False
+    eshopinfo = True
+    drawText(game, 100, 50, screen)  # Draw the game title
+    drawText(f"Description: {games[game]['description']}", 500, 90, screen)  # Draw the description
+    drawText(f"Author: {games[game]['author']}", 500, 130, screen)  # Draw the author
+    drawText("Press enter to download and run", 500, 170, screen)
+    pygame.display.flip()
+
+    # Wait for a key event before returning to the menu
+    waiting_for_input = True
+    while waiting_for_input:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                waiting_for_input = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:  # When Enter is pressed, go back
+                    waiting_for_input = False
+                    screen.fill("orange")
+                    drawText("Downloading Game", 500, 500, screen)
+                    pygame.display.flip()
+                    r = requests.get(server + "/download?game=" + gameId + ".py")
+                    # exec(r.text)
+                    with open('game.py', 'w') as file:
+                        file.write(r.text)
+                    print("Importing game")
+                    import game
+                    print("Starting!")
+                    pygame.mixer.music.stop();pygame.mixer.music.unload()
+                    game.start(os.getcwd())
+                    print("Game Ended...")
+                    running = True
+                    ready=False
+                    screen.fill("blue")
+                    pygame.quit()
+                    sys.exit(0)
+
 def waitForSound():
     while pygame.mixer.music.get_busy():
         1+1
@@ -24,6 +64,29 @@ def drawText(text, x, y, screen):
     screen.blit(text_surface, text_rect)
 clock = pygame.time.Clock()
 running=False
+def drawPage(page, games):
+    counter = 0
+    y_pos = 50
+    out = 0
+    out += page * 5
+    screen.fill("orange")
+
+    # Start from the "out" index, skipping the first "out" games
+    for i, (game_name, game_info) in enumerate(games.items()):
+        if i < out:  # Skip the first "out" games
+            continue
+
+        if counter >= 5:
+            break
+
+        # Drawing each game's info
+        game_id = game_info["id"]
+        game_description = game_info["description"]
+        drawText(f"{game_id}. {game_name}", 100, y_pos, screen)
+        y_pos += 40  # Move to the next line
+        counter += 1
+    drawText(f"Page {page}", 100, y_pos, screen)
+
 def start():
     global running
     global server
@@ -77,7 +140,12 @@ try:
     rmplay=False
     eshop=False
     eshoploading=False
+    eshopcatalogloading=False
+    catalog=False
+    eshopinfo=False
+    page = 0
     font = pygame.font.Font(None, 36)
+    gameid = 0
     if __name__ == '__main__':
         start()
     def restart():
@@ -100,6 +168,21 @@ try:
                         playSound("audio/eshop.mp3")
                         menu=False
                         eshoploading=True
+                if event.key in [pygame.K_0, pygame.K_1, pygame.K_2, pygame.K_3, pygame.K_4]:  # Check for number key press
+                    game_id = str(event.key - pygame.K_0)  # Get the number key pressed
+                    # Find the game name by the ID
+                    for game_name, game_info in games.items():
+                        if game_info["id"] == game_id:
+                            print(f"Selected game: {game_name}")
+                            gameid = game_info["id"]
+                            gameInfo(game_info["id"])
+                            break
+                if event.key == pygame.K_RIGHT:
+                    if eshop:
+                        page = page + 1
+                if event.key == pygame.K_LEFT:
+                    if eshop:
+                        page = page - 1
                 if event.key == pygame.K_SPACE:
                     if ready:
                         gameReading=False
@@ -128,6 +211,7 @@ try:
                         screen.fill("blue")
                         pygame.quit()
                         sys.exit(0)
+
 
         # fill the screen with a color to wipe away anything from last frame
         screen.fill("blue")
@@ -193,7 +277,7 @@ try:
                 r = requests.get(server + "/hello")
                 if r.status_code == 200:
                     eshoploading=False
-                    eshop=True
+                    eshopcatalogloading=True
                 else:
                     pygame.mixer.stop()
                     pygame.mixer.unload()
@@ -213,6 +297,91 @@ try:
                 eshoploading=False
                 eshop=False
                 menu=True
+        if eshopcatalogloading:
+            try:
+                # games = catalog
+                screen.fill("orange")
+                drawText("TailsGame shop", 300, 500, screen)
+                drawText("Loading catalog", screen.get_width() // 2, screen.get_height() // 2, screen)
+                pygame.display.flip()
+                r = requests.get(server + "/catalog")
+                if r.status_code == 200:
+                    catalog = json.loads(r.text)
+                    eshopcatalogloading=False
+                    eshop=True
+                else:
+                    raise Exception("Not 200 Status code")
+            except Exception as e:
+                print("Exception:")
+                print(e)
+                playSound("audio/error.mp3")
+                # waitForSound()
+                screen.fill("orange")
+                drawText("Error connecting: Check console for details", 500, 500, screen)
+                pygame.display.flip()
+                time.sleep(3)
+                waitForSound()
+                eshoploading=False
+                eshopcatalogloading=False
+                eshop=False
+                menu=True
+
+
+        if eshop:
+            try:
+                games = catalog
+                screen.fill("orange")
+                # drawText("TailsGame shop", 300, 500, screen)
+                y_pos = 50  # Starting Y position for drawing text
+                try:
+                    drawPage(page, games)
+                except Exception as e:
+                    print("Exception: Most likely last or first page")
+                    print(e)
+                # for game_name, game_info in games.items():
+                #     # Drawing each game's info
+                #     game_id = game_info["id"]
+                #     game_description = game_info["description"]
+                #     drawText(f"{game_id}. {game_name}", 50, y_pos, screen)
+                #     y_pos += 40  # Move to the next line
+                # for event in pygame.event.get():
+                #     if event.type == pygame.QUIT:
+                #         running = False
+
+            except Exception as e:
+                print("Exception:")
+                print(e)
+                playSound("audio/error.mp3")
+                # waitForSound()
+                screen.fill("orange")
+                drawText("Error connecting: Check console for details", 500, 500, screen)
+                pygame.display.flip()
+                time.sleep(3)
+                waitForSound()
+                eshoploading=False
+                eshop=False
+                eshopcatalogloading=False
+                menu=True
+        if eshopinfo:
+            try:
+                gameInfo(gameid)
+            except Exception as e:
+                print("Exception:")
+                print(e)
+                playSound("audio/error.mp3")
+                # waitForSound()
+                screen.fill("orange")
+                drawText("Error displaying info: Check console for details", 500, 500, screen)
+                pygame.display.flip()
+                # time.sleep(3)
+                waitForSound()
+                eshoploading=False
+                eshop=True
+                eshopcatalogloading=False
+                menu=False
+                eshopinfo=False
+
+    # pygame.display.flip()  # Update the screen
 
         # flip() the display to put your work on screen
         pygame.display.flip()
@@ -220,7 +389,8 @@ try:
         clock.tick(60)  # limits FPS to 60
 except Exception as e:
     print("Tails1154 Unhandled exception:")
-    print(e)
+    # print(repo(e))
+    print(repr(e))
     # pygame.init()
     pygame.quit()
     pygame.init()
