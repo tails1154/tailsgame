@@ -1,5 +1,5 @@
 {
-    "floppy_location": "/dev/sdb1",
+    "floppy_location": "/dev/sdc1",
     "mount_location": "/mnt/floppy",
     "server": "http://localhost:5604",
     "fullscreen": "True"
