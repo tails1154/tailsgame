@@ -132,8 +132,8 @@ try:
     except:
         print("[WARNING] Exception occoured when trying to read server field in config.json . online functions will be disabled.")
         serveractive=False
-    else:
-        screen = pygame.display.set_mode((1280, 720))
+    # else:
+    #     screen = pygame.display.set_mode((1280, 720))
     menu=True
     gameReading=False
     ready=False
