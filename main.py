@@ -252,7 +252,7 @@ try:
                         pygame.mixer.music.play(loops=-1)
                         print("Importing game")
                         import game
-                        print("Starting!")
+                        print("Starting...")
                         pygame.mixer.music.stop();pygame.mixer.music.unload()
                         game.start(mount)
                         print("Game Ended...")
