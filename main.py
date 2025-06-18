@@ -183,7 +183,7 @@ try:
                 if event.key == pygame.K_LEFT:
                     if eshop:
                         page = page - 1
-                if event.key == pygame.K_SPACE:
+                if True:
                     if ready:
                         gameReading=False
                         ready=False
